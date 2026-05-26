@@ -1,19 +1,33 @@
 `timescale 1ns/1ps
 
-// ============================================================================
-// safety_arbiter.sv (ARBS-B) - POLISHED v2
-// ----------------------------------------------------------------------------
-// Final actuation authority before actuator_if / PWM.
+// NOTE: Keep synthesizable RTL free of `default_nettype directives.
+
+// =============================================================================
+// Module      : safety_arbiter
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Selects the final braking command before the actuator output interface.
 //
-// Improvements vs v1:
-//   1) Watchdog math guarded (no 0 / underflow), and counter sized safely
-//   2) Driver hygiene: if driver_active=0 => driver_cmd treated as 0
-//   3) Optional sim-safe X/Z guards (synthesizable-friendly style)
-//   4) ARBS release-hold clamped to a sane max (prevents accidental long hold)
-//   5) Output still deterministic + clamp to CMD_MAX + fail-silent on faults
+//   The module arbitrates between the driver brake command and the ARBS emergency
+//   brake command, while enforcing global safety gating, watchdog protection,
+//   command clamping, and fail-silent behavior during faults.
 //
-// Coding policy: synthesizable SystemVerilog only (logic/always_ff/always_comb)
-// ============================================================================
+// Key Functions:
+//   - Gives ARBS emergency braking priority when active
+//   - Allows normal driver braking when no emergency override is active
+//   - Forces safe zero command during faults or disabled braking conditions
+//   - Detects missing 1 kHz timing ticks using a clock-domain watchdog
+//   - Applies a short release hold to avoid emergency-command deglitching
+//   - Prevents stale driver command leakage when driver_active is low
+//   - Exposes arbitration source and watchdog status for debug visibility
+//
+// Design Notes:
+//   This block is the final authority selector before command shaping and PWM
+//   generation. It does not generate brake profiles; it selects the safest
+//   available command from upstream decision logic.
+// =============================================================================
 
 module safety_arbiter #(
     // ------------------------------------------------------------
