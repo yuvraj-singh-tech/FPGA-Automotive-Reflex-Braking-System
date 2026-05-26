@@ -1,18 +1,38 @@
 `timescale 1ns/1ps
-// NOTE (ARBSB RTL policy): no `default_nettype in synthesizable RTL.
 
-// ============================================================================
-// top_arbsb.sv  (ARBS-B)  - Paranoid, deterministic integration (Automotive style)
-// ----------------------------------------------------------------------------
-// MUST-FIXES applied in this top:
-//   1) safety_arbiter watchdog clock alignment: CLK_HZ set to 33_333_333
-//   2) Explicit param alignment for CMD_MAX + hold values (no hidden defaults)
+// NOTE: Keep synthesizable RTL free of `default_nettype directives.
+
+// =============================================================================
+// Module      : top_arbs
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Top-level integration module for the ARBS FPGA braking controller.
 //
-// NOTE: You still MUST fix your brake_profile file's last line:
-//   replace "endmodul" -> "endmodule"  (compile blocker)
-// ============================================================================
+//   This module connects reset synchronization, timing generation, brake input
+//   conditioning, driver-intent processing, dual safety supervision, voter logic,
+//   emergency brake profiling, final arbitration, output shaping, and PWM
+//   actuator generation into one complete FPGA control pipeline.
+//
+// Key Functions:
+//   - Synchronizes raw reset and generates 1 kHz / 50 Hz timing pulses
+//   - Conditions brake switch and ADC-based brake input signals
+//   - Converts brake input into stable driver intent
+//   - Runs two independent safety supervisor channels
+//   - Votes supervisor outputs and detects mismatch faults
+//   - Generates emergency brake profile when required
+//   - Arbitrates between driver braking and ARBS emergency braking
+//   - Shapes final actuator command and generates servo-style PWM output
+//   - Exposes debug signals for simulation waveform or ILA visibility
+//
+// Design Notes:
+//   The top-level uses a 33.333 MHz system clock and keeps command scaling
+//   consistent across the braking pipeline with CMD_MAX as the shared command
+//   limit.
+// =============================================================================
 
-module top_arbsb #(
+module top_arbs #(
     // Global scaling (consistent across modules)
     parameter int unsigned CMD_MAX = 1000,
 
@@ -95,7 +115,7 @@ module top_arbsb #(
     logic        fault_stuck, fault_spike, fault_range;
 
     brake_input_if #(
-        .ADC_MAX (4095)  // keep explicit for clarity
+        .ADC_MAX (4095)  // keeping explicit for clarity
     ) u_brake_input_if (
         .clk             (clk_33m),
         .rst             (rst_sync),
@@ -289,7 +309,7 @@ module top_arbsb #(
     end
 
     // =========================================================================
-    // 8) safety_arbiter (authority + watchdog)  **CLK_HZ FIX APPLIED**
+    // 8) safety_arbiter (authority + watchdog)  
     // =========================================================================
     logic [15:0] brake_cmd_final;
     logic [1:0]  arb_src_sel;
@@ -299,7 +319,7 @@ module top_arbsb #(
         .CMD_MAX              (CMD_MAX),
         .ARBS_RELEASE_HOLD_MS (5),
         .ARBS_HOLD_MAX_MS     (50),
-        .CLK_HZ               (33_333_333),  // IMPORTANT: match clk_33m
+        .CLK_HZ               (33_333_333),  
         .WD_TIMEOUT_MS        (250)
     ) u_safety_arbiter (
         .clk            (clk_33m),
