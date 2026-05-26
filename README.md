@@ -216,10 +216,7 @@ The testbench uses accelerated timing pulses for faster simulation while preserv
 ```text
 rtl/          → SystemVerilog RTL modules
 tb/           → System-level testbench
-constraints/  → FPGA constraint files
-scripts/      → Vivado simulation or build scripts
-docs/         → architecture notes and design explanation
-results/      → diagrams, waveforms, timing screenshots, logs
+results/      → diagrams, waveforms, timing screenshots
 ```
 
 ---
