@@ -163,6 +163,23 @@ ARBS follows a driver-first safety architecture. The system does not replace the
 
 ---
 
+## 🛠️ <i>Target Platform</i>
+
+<div align="center">
+
+| Item | Details |
+|------|---------|
+| FPGA Board | Xilinx SP701 Evaluation Board |
+| FPGA Family | Spartan-7 |
+| Clock Used | 33.333 MHz system clock with 1 kHz control tick and 50 Hz PWM actuator frame |
+| HDL | SystemVerilog |
+| Toolchain | Xilinx Vivado |
+| Verification | Full-system RTL simulation testbench |
+
+</div>
+
+---
+
 ## 🧪 <i>Verification</i>
 
 A full-system testbench validates the ARBS pipeline across braking, release, noise, fallback, and fault-observation scenarios.
@@ -239,7 +256,7 @@ results/      → diagrams, waveforms, timing screenshots
 
 ARBS is developed as an FPGA-based safety-control architecture to demonstrate deterministic braking assistance, RTL supervision, fault handling, arbitration, and actuator command generation.
 
-The design is intended for simulation, FPGA implementation, and portfolio-level hardware design demonstration.
+The design is intended for simulation, FPGA implementation, and professional FPGA design demonstration.
 
 ---
 
