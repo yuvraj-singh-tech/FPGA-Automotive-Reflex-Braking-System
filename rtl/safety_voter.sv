@@ -1,5 +1,31 @@
 `timescale 1ns/1ps
 
+// =============================================================================
+// Module      : safety_voter
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Votes the outputs of two independent safety supervisor channels.
+//
+//   The module compares supervisor channel A and channel B decisions, combines
+//   their emergency and fault requests, and detects persistent disagreement
+//   between the channels as a voter mismatch fault.
+//
+// Key Functions:
+//   - Combines allow_brake using conservative AND voting
+//   - Combines emergency requests using OR voting
+//   - Combines supervisor faults and voter mismatch into final fault request
+//   - Detects persistent disagreement between supervisor channels
+//   - Supports sticky or self-clearing mismatch fault behavior
+//   - Optionally suppresses emergency request when a final fault is active
+//   - Provides mismatch counter and live mismatch status for debug visibility
+//
+// Design Notes:
+//   This block improves decision robustness by comparing two supervisor channels
+//   before sending final safety requests to the braking profile and arbiter.
+// =============================================================================
+
 module safety_voter #(
     // ------------------------------------------------------------
     // Automotive-style mismatch policy @ 1 kHz tick
