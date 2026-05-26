@@ -59,7 +59,7 @@ module pwm_actuator #(
     endfunction
 
     // ============================================================
-    // us -> cycles helper (unchanged)
+    // us -> cycles helper 
     // ============================================================
     function automatic [31:0] us_to_cycles(input int unsigned us);
         longint unsigned num;
@@ -68,7 +68,7 @@ module pwm_actuator #(
     endfunction
 
     // ============================================================
-    // Arming logic (UNCHANGED)
+    // Arming logic 
     // ============================================================
     localparam int unsigned ARM_DEN   = (ARM_MS < 1) ? 1 : ARM_MS;
     localparam int unsigned ARM_CNT_W = (ARM_DEN <= 1) ? 1 : $clog2(ARM_DEN + 1);
@@ -94,7 +94,7 @@ module pwm_actuator #(
     end
 
     // ============================================================
-    // STAGE 1 PIPELINE: cmd ? pulse_us
+    // STAGE 1 PIPELINE: Command to pulse width
     // ============================================================
     localparam int unsigned CMD_SPAN_US = PULSE_MAX_US - PULSE_MIN_US;
 
@@ -122,7 +122,7 @@ module pwm_actuator #(
     end
 
     // ============================================================
-    // STAGE 2 PIPELINE: pulse_us ? cycles (tick_50hz)
+    // STAGE 2 PIPELINE: Pulse width to clock cycles
     // ============================================================
     logic [31:0] frame_cnt;
     logic [31:0] pulse_cycles_latched;
@@ -149,7 +149,7 @@ module pwm_actuator #(
             pwm_out <= (frame_cnt < pulse_cycles_latched);
     end
 
-    // Debug taps (UNCHANGED)
+    // Debug taps 
     assign pulse_us_latched_dbg     = pulse_us_latched;
     assign pulse_cycles_latched_dbg = pulse_cycles_latched;
 
