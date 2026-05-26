@@ -1,26 +1,30 @@
 `timescale 1ns/1ps
 
 // =============================================================================
-// Module: brake_input_if
+// Module      : brake_input_if
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
 // -----------------------------------------------------------------------------
-// Converts raw driver brake input into clean, validated braking intent signals.
+// Description :
+//   Converts raw driver brake input into clean, validated braking intent signals.
 //
-// The interface supports two input paths:
-//   1. Analog brake magnitude through a 12-bit ADC
-//   2. Digital brake switch fallback
+//   The interface supports two input paths:
+//     1. Analog brake magnitude through a 12-bit ADC
+//     2. Digital brake switch fallback
 //
-// Main functions:
+// Key Functions:
 //   - Synchronizes the raw digital brake input
-//   - Holds recent ADC validity for short dropouts
+//   - Holds recent ADC validity through short dropouts
 //   - Rejects implausible ADC samples using range and jump checks
-//   - Detects stuck ADC behavior during braking intent
-//   - Debounces brake press/release events
-//   - Classifies brake intensity into NONE / LIGHT / MEDIUM / HARD
+//   - Detects stuck ADC behavior during active braking intent
+//   - Debounces brake press and release events
+//   - Classifies brake intensity as NONE, LIGHT, MEDIUM, or HARD
 //   - Uses hysteresis to avoid level chatter near thresholds
 //
-// Design note:
+// Design Notes:
 //   The ADC path is preferred when healthy. If the ADC path is unavailable or
-//   faulty, the synchronized digital brake input is used as a safe fallback.
+//   faulty, the synchronized digital brake input is used as a deterministic
+//   fallback path.
 // =============================================================================
 
 module brake_input_if #(
