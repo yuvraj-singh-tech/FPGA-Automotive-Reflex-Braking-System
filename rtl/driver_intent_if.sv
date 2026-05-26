@@ -1,5 +1,33 @@
 `timescale 1ns/1ps
 
+// =============================================================================
+// Module      : driver_intent_if
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Converts validated brake-input signals into stable driver intent for the
+//   ARBS safety pipeline.
+//
+//   The module confirms driver brake levels, rejects short glitches, holds valid
+//   intent across brief input dropouts, detects panic braking, and flags
+//   implausible intent behavior such as excessive accepted toggles.
+//
+// Key Functions:
+//   - Confirms LIGHT, MEDIUM, HARD, and RELEASE intent with separate timing windows
+//   - Holds last stable driver intent during short validity interruptions
+//   - Applies minimum dwell time after each accepted intent transition
+//   - Generates a release_ok pulse after confirmed brake release
+//   - Detects confirmed panic braking from stable HARD input
+//   - Monitors excessive accepted intent toggling as a sticky intent fault
+//   - Optionally maps upstream ADC faults into intent_fault
+//
+// Design Notes:
+//   This block does not generate brake commands directly. It produces stable
+//   driver-intent signals for supervisors, arbitration, and downstream safety
+//   decision logic.
+// =============================================================================
+
 module driver_intent_if #(
     // ------------------------------------------------------------
     // Confirmation windows (1 kHz ticks -> ms)
@@ -30,7 +58,7 @@ module driver_intent_if #(
     parameter int unsigned TOGGLE_WIN_MS    = 500,
     parameter int unsigned MAX_TOGGLES      = 8,
 
-    // Policy: if brake_input_if reports sticky ADC faults, you may want to mark intent_fault too
+    //  if brake_input_if reports sticky ADC faults, may want to mark intent_fault too
     parameter bit          FAULTS_CAUSE_INTENT_FAULT = 1'b0
 ) (
     input  logic       clk,
