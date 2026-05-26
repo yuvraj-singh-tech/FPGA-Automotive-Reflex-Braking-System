@@ -1,5 +1,32 @@
 `timescale 1ns/1ps
 
+// =============================================================================
+// Module      : safety_supervisor_A
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Primary safety supervisor channel for emergency braking decisions.
+//
+//   This module monitors stable driver intent, panic braking, release status,
+//   and intent faults to generate emergency and fault requests for the ARBS
+//   decision pipeline.
+//
+// Key Functions:
+//   - Detects sustained HARD braking intent
+//   - Allows panic_brake to trigger emergency braking immediately when enabled
+//   - Holds emergency state for a minimum safety window
+//   - Requires stable low driver intent before clearing emergency request
+//   - Tolerates brief invalid driver-intent gaps
+//   - Latches persistent invalid intent or intent_fault as a fault request
+//   - Exposes supervisor state for waveform or ILA visibility
+//
+// Design Notes:
+//   This channel uses direct threshold-and-timer supervision. It is intended to
+//   provide a clear, deterministic safety decision path for comparison with the
+//   second supervisor channel.
+// =============================================================================
+
 module safety_supervisor_A #(
     // ------------------------------------------------------------
     // Emergency decision tuning @ 1 kHz tick (ms)
@@ -20,7 +47,7 @@ module safety_supervisor_A #(
     input  logic       rst,
     input  logic       tick_1khz,
 
-    // From driver_intent_if (aligned exactly)
+    // From driver_intent_if 
     input  logic       drv_valid,
     input  logic [1:0] drv_level,     // 0 NONE, 1 LIGHT, 2 MED, 3 HARD
     input  logic       panic_brake,   // confirmed + held
@@ -32,7 +59,7 @@ module safety_supervisor_A #(
     output logic       emergency_req,
     output logic       fault_req,
 
-    // Optional debug
+    // Debug visibility
     output logic [2:0] supv_state
 );
 
