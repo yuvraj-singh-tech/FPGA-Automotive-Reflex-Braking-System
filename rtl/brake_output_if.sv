@@ -1,5 +1,31 @@
 `timescale 1ns/1ps
-// NOTE (ARBSB RTL policy): no `default_nettype in synthesizable RTL.
+
+// =============================================================================
+// Module      : brake_output_if
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Actuator-facing output interface for the ARBS braking command path.
+//
+//   This block receives the final brake command from the safety arbiter and
+//   converts it into a clean actuator command with output gating, command
+//   clamping, slew-rate limiting, watchdog hard-cut behavior, and optional
+//   integrity markers.
+//
+// Key Functions:
+//   - Clamps brake command to the configured command range
+//   - Applies separate ramp-up and ramp-down slew limits at 1 kHz
+//   - Forces immediate output disable on watchdog fault
+//   - Generates sticky output fault status
+//   - Provides stale-command indication through watchdog status
+//   - Generates optional alive counter and CRC-8 integrity marker
+//   - Exposes debug taps for waveform or ILA inspection
+//
+// Design Notes:
+//   This module does not decide braking authority. It only shapes and protects
+//   the command already selected by the upstream safety arbitration stage.
+// =============================================================================
 
 module brake_output_if #(
     // ------------------------------------------------------------
