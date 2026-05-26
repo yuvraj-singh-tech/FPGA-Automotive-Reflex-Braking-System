@@ -6,7 +6,8 @@
 
 <br><br>
 
-<img src="results/arbs_car_demo.png" width="82%">
+<img src="https://github.com/user-attachments/assets/78aef1a0-18ae-43c0-af89-49f4554d8358" width="82%" alt="ARBS car demo">
+
 
 </div>
 
@@ -27,7 +28,8 @@ Unlike a software-loop based controller, ARBS keeps the control path hardware-dr
 ## 🧩 <i>System Architecture</i>
 
 <p align="center">
-  <img src="results/arbs_system_architecture.png" width="85%">
+ <img src="https://github.com/user-attachments/assets/91d1709c-9e83-4976-869a-b08b8675a876" width="85%" alt="ARBS system architecture">
+
 </p>
 
 <p align="center">
@@ -206,27 +208,39 @@ The testbench uses accelerated timing pulses for faster simulation while preserv
 
 ---
 
-## 📊 <i>Results</i>
+## 📊 <i>Results & Validation </i>
 
-<p align="center">
-  <img src="results/arbs_waveform.png" width="85%">
-</p>
+ARBS was validated through RTL simulation, waveform inspection, and FPGA implementation timing analysis.  
+The result artifacts below are kept in the [`results/`](./results) folder.
 
-<p align="center">
-  Full-system RTL waveform showing braking input, driver intent, arbitration, output command, and PWM behavior.
-</p>
+<div align="center">
 
-<br>
+| Artifact | What It Shows | Link |
+|---------|---------------|------|
+| 🧪 Simulation Log | Vivado console output showing all 10 full-system scenarios passing | [`arbs_simulation_log.png`](./results/arbs_simulation_log.png) |
+| 📈 RTL Waveform | Full-system waveform showing brake input, driver intent, arbitration, command output, and PWM behavior | [`arbs_waveform.png`](./results/arbs_waveform.png) |
+| ⏱️ Timing Summary | Vivado timing result showing setup, hold, and pulse-width timing status | [`arbs_timing_summary.png`](./results/arbs_timing_summary.png) |
+| 🧩 Synthesized Architecture | Vivado-generated RTL/system schematic of the integrated ARBS pipeline | [`arbs_system_architecture.png`](./results/arbs_system_architecture.png) |
+| 🔁 Control Flow | High-level ARBS control flow from driver input to PWM brake actuator | [`arbs_control_flow.png`](./results/arbs_control_flow.png) |
 
-<p align="center">
-  <img src="results/arbs_timing_summary.png" width="70%">
-</p>
-
-<p align="center">
-  Vivado timing summary after FPGA implementation.
-</p>
+</div>
 
 ---
+
+## ✅ <i>Verification Summary</i>
+
+<div align="center">
+
+| Checkpoint | Result |
+|-----------|--------|
+| Full-system simulation | Passed |
+| Scenario coverage | S0 to S10 validated |
+| Watchdog observation | Verified in simulation |
+| Mismatch fault behavior | No false mismatch in normal scenarios |
+| PWM actuator path | Command-to-PWM behavior observed |
+| Timing analysis | All specified timing constraints met |
+
+</div>
 
 ## 📁 <i>Repository Structure</i>
 
@@ -238,19 +252,6 @@ results/      → diagrams, waveforms, timing screenshots
 
 ---
 
-## 🔗 <i>Detailed Documentation</i>
-
-<div align="center">
-
-| Area | Description |
-|------|------------|
-| ⚙️ <a href="./rtl/README.md"><b>RTL Design</b></a> | module-level architecture and signal flow |
-| 🧪 <a href="./tb/README.md"><b>Verification</b></a> | testbench scenarios and validation checks |
-| 📊 <a href="./results/README.md"><b>Results</b></a> | waveforms, timing screenshots, and simulation outputs |
-
-</div>
-
----
 
 ## 🎯 <i>Project Scope</i>
 
