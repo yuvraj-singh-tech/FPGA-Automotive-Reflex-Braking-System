@@ -1,5 +1,31 @@
 `timescale 1ns/1ps
 
+// =============================================================================
+// Module      : safety_supervisor_B
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Secondary safety supervisor channel for emergency braking decisions.
+//
+//   This module uses a risk-score integrator to evaluate driver braking intent
+//   over time. HARD braking increases the risk score strongly, MEDIUM and LIGHT
+//   contribute more gradually, and low or invalid intent decays the score.
+//
+// Key Functions:
+//   - Tracks braking risk using a saturating score integrator
+//   - Triggers emergency braking when HARD intent and risk score meet threshold
+//   - Supports immediate emergency entry from panic_brake when enabled
+//   - Holds emergency state for a minimum safety window
+//   - Clears emergency only after stable low intent and score decay
+//   - Latches persistent invalid intent or intent_fault as a fault request
+//   - Provides supervisor state visibility for debug and verification
+//
+// Design Notes:
+//   This channel provides a second, independent decision style compared to the
+//   direct threshold-and-timer logic in safety_supervisor_A.
+// =============================================================================
+
 module safety_supervisor_B #(
     // ------------------------------------------------------------
     // Same external policy knobs as A
@@ -215,9 +241,9 @@ module safety_supervisor_B #(
                             supv_state     <= S_EMERG;
                             emerg_hold_cnt <= EMERG_MIN_HOLD_MS_16;
 
-                        // =====================================================
-                        // FIX (ARBSB): Only allow integrator-based entry on HARD
-                        // =====================================================
+                        // ===============================================================
+                        // Integrator-based emergency entry is allowed only on HARD intent
+                        // ===============================================================
                         end else if (drv_valid && (drv_level == 2'd3) &&
                                      (score_next >= EMERG_SCORE_ENTER_8)) begin
                             emergency_req  <= 1'b1;
