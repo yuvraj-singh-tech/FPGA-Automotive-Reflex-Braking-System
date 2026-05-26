@@ -1,9 +1,29 @@
 `timescale 1ns/1ps
-// NOTE (ARBSB RTL policy): no `default_nettype in synthesizable RTL.
 
-// ============================================================================
-// pwm_actuator.sv (ARBS-B) - TIMING-OPTIMIZED (internal pipelining)
-// ============================================================================
+// =============================================================================
+// Module      : pwm_actuator
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Converts the protected brake command into a servo-style PWM actuator signal.
+//
+//   The module waits for a healthy output interface, arms after a configurable
+//   safety delay, maps the normalized brake command into a bounded pulse width,
+//   and generates a 50 Hz PWM signal suitable for actuator demonstration.
+//
+// Key Functions:
+//   - Requires stable enable, no output fault, and no stale command before arming
+//   - Maps command range 0..CMD_MAX into PULSE_MIN_US..PULSE_MAX_US
+//   - Forces SAFE_US pulse width when disabled, faulty, stale, or unarmed
+//   - Latches pulse width once per 50 Hz frame
+//   - Generates PWM using clock-cycle comparison against the latched pulse width
+//   - Provides debug visibility for latched pulse width in microseconds and cycles
+//
+// Design Notes:
+//   This module is actuator-facing only. Upstream safety logic decides when
+//   braking is allowed; this block only converts the selected command into PWM.
+// =============================================================================
 
 module pwm_actuator #(
     parameter int unsigned CLK_HZ        = 33_333_333,
