@@ -1,5 +1,26 @@
 `timescale 1ns/1ps
 
+// =============================================================================
+// Module      : tick_gen
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Generates fixed-rate timing pulses for the ARBS control pipeline.
+//
+//   The module derives a 1 kHz system tick from the FPGA clock and then derives
+//   a 50 Hz actuator-frame tick from the 1 kHz tick.
+//
+// Key Functions:
+//   - Generates a 1 ms tick as a single-clock pulse
+//   - Generates a 20 ms / 50 Hz tick as a single-clock pulse
+//   - Keeps all timing synchronous to the system clock
+//   - Provides timing references for control, debounce, watchdog, and PWM logic
+//
+// Design Notes:
+//   The default constants are selected for a 33.333 MHz system clock.
+// =============================================================================
+
 module tick_gen (
     input  logic clk,       // 33.333 MHz system clock
     input  logic rst,       // synchronous, active-high (from reset_sync)
@@ -32,7 +53,7 @@ module tick_gen (
                 tick_1khz <= 1'b0;
             end
 
-            // 50 Hz tick (derived from 1 kHz) - EXACT behavior preserved
+            // 50 Hz tick derived from the 1 kHz timing pulse
             if (tick_1khz) begin
                 if (ctr_50hz == DIV_50HZ_FROM_1KHZ - 1) begin
                     ctr_50hz  <= 5'd0;
