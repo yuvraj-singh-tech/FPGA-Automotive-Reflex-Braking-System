@@ -1,24 +1,32 @@
 `timescale 1ns/1ps
 
-// ============================================================================
-// brake_profile.sv  (ARBS-B)
-// ----------------------------------------------------------------------------
-// Aligned inputs from safety_voter:
-//   allow_brake_final, emergency_req_final, fault_req_final
+// =============================================================================
+// Module      : brake_profile
+// Project     : FPGA Automotive Reflex Braking System (ARBS)
+// Author      : Yuvraj Singh
+// -----------------------------------------------------------------------------
+// Description :
+//   Generates the controlled braking profile used during confirmed emergency
+//   braking conditions.
 //
-// What it does:
-//   - Deterministic @ tick_1khz
-//   - Noise-aware entry/exit confirmation
-//   - Minimum emergency hold
-//   - Two-stage ramp-up (bite + controlled ramp)
-//   - Controlled ramp-down
-//   - Fault => immediate fail-silent (brake_cmd=0)
+//   The module receives voted safety requests and produces a bounded brake
+//   command with confirmation timing, minimum emergency hold, two-stage ramp-up,
+//   controlled release, and fail-silent fault behavior.
 //
-// Command format:
-//   - brake_cmd is 0..CMD_MAX (default: 0..1000 permille)
-// ----------------------------------------------------------------------------
-// Coding policy: synthesizable SystemVerilog only (logic/always_ff/always_comb)
-// ============================================================================
+// Key Functions:
+//   - Confirms emergency requests before entering active braking
+//   - Holds emergency braking for a minimum safety window
+//   - Applies a fast initial brake response up to the bite threshold
+//   - Applies a slower controlled ramp after the bite threshold
+//   - Ramps down smoothly after the emergency condition clears
+//   - Forces brake command to zero during fault conditions
+//   - Provides debug counters and state visibility for simulation or ILA use
+//
+// Design Notes:
+//   The command output uses the project-wide 0 to CMD_MAX scaling convention.
+//   By default, CMD_MAX = 1000, representing a normalized permille-style command
+//   range from 0% to 100% braking effort.
+// =============================================================================
 
 module brake_profile #(
     // ------------------------------------------------------------
